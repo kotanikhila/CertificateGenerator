@@ -1,0 +1,3 @@
+student_name,student_email,achievement,event_name,organization_name,course_details,template_name,font_size,font_style,expiry_date
+Nikhila,nikhila2@gmail.com,Completed Python Course,Python Workshop,ABC Foundation,Python basics and mini project,Template 1,20,Helvetica,2029-11-30
+Rahul,rahul@gmail.com,Completed Web Development Course,React Workshop,ABC Foundation,React frontend and FastAPI backend project,Template 2,20,Times-Roman,2029-11-30
