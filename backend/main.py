@@ -271,6 +271,11 @@ def all_certificates(db: Session = Depends(get_db)):
     certificates = db.query(Certificate).all()
     return certificates
 
+# Add health check endpoint
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "message": "Service is running"}
+
 # Add this at the bottom for Railway
 if __name__ == "__main__":
     import uvicorn
