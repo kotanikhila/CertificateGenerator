@@ -3,6 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 import pandas as pd
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 from database import Base, engine, SessionLocal
 from models import User, Certificate
@@ -15,9 +20,10 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Certificate Generator Web App")
 
+# Updated CORS for Railway
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["*"],  # Changed for Railway
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -246,8 +252,8 @@ def verify_certificate(certificate_code: str, db: Session = Depends(get_db)):
         "expiry_date": cert.expiry_date,
         "certificate_file": cert.certificate_file,
         "qr_file": cert.qr_file,
-        "download_url": f"http://127.0.0.1:8000/files/{cert.certificate_file}",
-        "qr_url": f"http://127.0.0.1:8000/files/{cert.qr_file}"
+        "download_url": f"/files/{cert.certificate_file}",
+        "qr_url": f"/files/{cert.qr_file}"
     }
 
 
@@ -264,3 +270,9 @@ def user_certificates(email: str, db: Session = Depends(get_db)):
 def all_certificates(db: Session = Depends(get_db)):
     certificates = db.query(Certificate).all()
     return certificates
+
+# Add this at the bottom for Railway
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
