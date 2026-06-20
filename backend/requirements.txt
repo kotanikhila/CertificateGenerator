@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg2-binary
+pandas
+qrcode[pil]
+reportlab
+passlib[bcrypt]
+python-jose[cryptography]
+python-dotenv
+python-multipart
