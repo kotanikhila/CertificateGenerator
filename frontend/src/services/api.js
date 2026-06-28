@@ -1,6 +1,6 @@
 ﻿import axios from 'axios';
 
-// ✅ UPDATE THIS URL with your backend URL
+// ✅ CORRECT BACKEND URL
 const API_URL = 'https://certificate-generator-backend-8oxs.onrender.com';
 
 export const api = axios.create({
@@ -23,7 +23,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor for error handling
+// Response interceptor
 api.interceptors.response.use(
   (response) => response,
   (error) => {

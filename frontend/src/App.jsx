@@ -2,6 +2,131 @@
 import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
 import { api } from './services/api';
 
+// ========== STYLES ==========
+const styles = {
+  container: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '100vh',
+    background: '#f0f2f5',
+    padding: '20px',
+  },
+  card: {
+    background: 'white',
+    padding: '40px',
+    borderRadius: '10px',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+    textAlign: 'center',
+    maxWidth: '400px',
+    width: '100%',
+  },
+  dashboardContainer: {
+    padding: '20px',
+    maxWidth: '800px',
+    margin: '0 auto',
+  },
+  title: {
+    fontSize: '32px',
+    color: '#1a1a2e',
+    marginBottom: '10px',
+  },
+  subtitle: {
+    fontSize: '20px',
+    color: '#666',
+    marginBottom: '30px',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+  },
+  input: {
+    padding: '12px',
+    border: '1px solid #ddd',
+    borderRadius: '5px',
+    fontSize: '16px',
+  },
+  loginBtn: {
+    padding: '12px',
+    background: '#007bff',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    fontSize: '16px',
+    cursor: 'pointer',
+  },
+  signupBtn: {
+    padding: '12px',
+    background: '#28a745',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    fontSize: '16px',
+    cursor: 'pointer',
+  },
+  logoutBtn: {
+    padding: '12px',
+    background: '#dc3545',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+  },
+  error: {
+    background: '#ffebee',
+    color: '#c62828',
+    padding: '10px',
+    borderRadius: '5px',
+    marginBottom: '15px',
+  },
+  success: {
+    background: '#e8f5e9',
+    color: '#2e7d32',
+    padding: '10px',
+    borderRadius: '5px',
+    marginBottom: '15px',
+  },
+  buttons: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '15px',
+    marginTop: '20px',
+  },
+  link: {
+    marginTop: '20px',
+    color: '#666',
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '30px',
+    padding: '20px',
+    background: 'white',
+    borderRadius: '10px',
+    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+  },
+  headerRight: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '15px',
+  },
+  list: {
+    listStyle: 'none',
+    padding: 0,
+  },
+  listItem: {
+    padding: '10px',
+    borderBottom: '1px solid #eee',
+  },
+  loading: {
+    textAlign: 'center',
+    padding: '50px',
+    fontSize: '20px',
+  },
+};
+
 // ========== HOME COMPONENT ==========
 function Home() {
   return (
@@ -118,7 +243,9 @@ function SignUp() {
 // ========== DASHBOARD COMPONENT ==========
 function Dashboard() {
   const [user, setUser] = useState(null);
+  const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -129,8 +256,20 @@ function Dashboard() {
     }
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
     setUser(userData);
-    setLoading(false);
+    fetchCertificates();
   }, [navigate]);
+
+  const fetchCertificates = async () => {
+    try {
+      const response = await api.get('/all-certificates');
+      setCertificates(response.data || []);
+    } catch (error) {
+      console.error('Error fetching certificates:', error);
+      setError('Failed to load certificates');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -151,132 +290,105 @@ function Dashboard() {
           <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
         </div>
       </div>
+      {error && <div style={styles.error}>{error}</div>}
       <div style={styles.card}>
         <h3>Profile Information</h3>
         <p><strong>Name:</strong> {user?.name}</p>
         <p><strong>Email:</strong> {user?.email}</p>
         <p><strong>Role:</strong> {user?.role}</p>
       </div>
+      <div style={styles.card}>
+        <h3>Your Certificates</h3>
+        {certificates.length === 0 ? (
+          <p>No certificates found.</p>
+        ) : (
+          <ul style={styles.list}>
+            {certificates.map((cert) => (
+              <li key={cert.id} style={styles.listItem}>
+                <strong>{cert.student_name}</strong> - {cert.achievement}
+                <br />
+                <small>Code: {cert.certificate_code}</small>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      <div style={styles.card}>
+        <Link to="/generate" style={styles.loginBtn}>Generate Certificate</Link>
+      </div>
     </div>
   );
 }
 
-// ========== STYLES ==========
-const styles = {
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '100vh',
-    background: '#f0f2f5',
-    padding: '20px',
-  },
-  card: {
-    background: 'white',
-    padding: '40px',
-    borderRadius: '10px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    textAlign: 'center',
-    maxWidth: '400px',
-    width: '100%',
-  },
-  dashboardContainer: {
-    padding: '20px',
-    maxWidth: '800px',
-    margin: '0 auto',
-  },
-  title: {
-    fontSize: '32px',
-    color: '#1a1a2e',
-    marginBottom: '10px',
-  },
-  subtitle: {
-    fontSize: '20px',
-    color: '#666',
-    marginBottom: '30px',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-  },
-  input: {
-    padding: '12px',
-    border: '1px solid #ddd',
-    borderRadius: '5px',
-    fontSize: '16px',
-  },
-  loginBtn: {
-    padding: '12px',
-    background: '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    fontSize: '16px',
-    cursor: 'pointer',
-  },
-  signupBtn: {
-    padding: '12px',
-    background: '#28a745',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    fontSize: '16px',
-    cursor: 'pointer',
-  },
-  logoutBtn: {
-    padding: '12px',
-    background: '#dc3545',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-  },
-  error: {
-    background: '#ffebee',
-    color: '#c62828',
-    padding: '10px',
-    borderRadius: '5px',
-    marginBottom: '15px',
-  },
-  success: {
-    background: '#e8f5e9',
-    color: '#2e7d32',
-    padding: '10px',
-    borderRadius: '5px',
-    marginBottom: '15px',
-  },
-  buttons: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '15px',
-    marginTop: '20px',
-  },
-  link: {
-    marginTop: '20px',
-    color: '#666',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '30px',
-    padding: '20px',
-    background: 'white',
-    borderRadius: '10px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-  },
-  headerRight: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '15px',
-  },
-  loading: {
-    textAlign: 'center',
-    padding: '50px',
-    fontSize: '20px',
-  },
-};
+// ========== GENERATE CERTIFICATE COMPONENT ==========
+function GenerateCertificate() {
+  const [formData, setFormData] = useState({
+    student_name: '',
+    student_email: '',
+    achievement: '',
+    event_name: '',
+    organization_name: '',
+    course_details: '',
+    template_name: 'Template 1',
+    font_size: 20,
+    font_style: 'Helvetica',
+    expiry_date: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+    }
+  }, [navigate]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const response = await api.post(/generate-certificate/, formData);
+      if (response.data) {
+        setSuccess('Certificate generated successfully!');
+        setTimeout(() => navigate('/dashboard'), 2000);
+      }
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to generate certificate. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={styles.container}>
+      <div style={{...styles.card, maxWidth: '500px'}}>
+        <h2 style={styles.subtitle}>Generate Certificate</h2>
+        {error && <div style={styles.error}>{error}</div>}
+        {success && <div style={styles.success}>{success}</div>}
+        <form onSubmit={handleSubmit} style={styles.form}>
+          <input type="text" placeholder="Student Name" value={formData.student_name} onChange={(e) => setFormData({...formData, student_name: e.target.value})} style={styles.input} required />
+          <input type="email" placeholder="Student Email" value={formData.student_email} onChange={(e) => setFormData({...formData, student_email: e.target.value})} style={styles.input} required />
+          <input type="text" placeholder="Achievement" value={formData.achievement} onChange={(e) => setFormData({...formData, achievement: e.target.value})} style={styles.input} required />
+          <input type="text" placeholder="Event Name" value={formData.event_name} onChange={(e) => setFormData({...formData, event_name: e.target.value})} style={styles.input} required />
+          <input type="text" placeholder="Organization Name" value={formData.organization_name} onChange={(e) => setFormData({...formData, organization_name: e.target.value})} style={styles.input} required />
+          <input type="text" placeholder="Course Details" value={formData.course_details} onChange={(e) => setFormData({...formData, course_details: e.target.value})} style={styles.input} />
+          <input type="date" placeholder="Expiry Date" value={formData.expiry_date} onChange={(e) => setFormData({...formData, expiry_date: e.target.value})} style={styles.input} />
+          <button type="submit" style={styles.loginBtn} disabled={loading}>
+            {loading ? 'Generating...' : 'Generate Certificate'}
+          </button>
+        </form>
+        <p style={styles.link}><Link to="/dashboard">Back to Dashboard</Link></p>
+      </div>
+    </div>
+  );
+}
 
 // ========== MAIN APP ==========
 function App() {
@@ -290,6 +402,9 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/dashboard" element={
           isAuthenticated ? <Dashboard /> : <Navigate to="/login" />
+        } />
+        <Route path="/generate" element={
+          isAuthenticated ? <GenerateCertificate /> : <Navigate to="/login" />
         } />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
