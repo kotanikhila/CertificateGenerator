@@ -1,14 +1,19 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+﻿from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+import os
 
-DATABASE_URL = "postgresql://postgres:nikhila@localhost/certificate_generator"
+# Use SQLite for Render (no PostgreSQL needed)
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./certificates.db")
 
-engine = create_engine(DATABASE_URL)
+# For SQLite
+if DATABASE_URL.startswith("sqlite"):
+    engine = create_engine(
+        DATABASE_URL, connect_args={"check_same_thread": False}
+    )
+else:
+    # For PostgreSQL (if you add it later)
+    engine = create_engine(DATABASE_URL)
 
-SessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=engine
-)
-
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
