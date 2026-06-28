@@ -2,7 +2,7 @@
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { api } from './services/api';
 
-// Home Component
+// ========== HOME COMPONENT ==========
 function Home() {
   return (
     <div style={styles.container}>
@@ -18,7 +18,7 @@ function Home() {
   );
 }
 
-// Login Component
+// ========== LOGIN COMPONENT ==========
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -64,7 +64,7 @@ function Login() {
   );
 }
 
-// SignUp Component
+// ========== SIGNUP COMPONENT ==========
 function SignUp() {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'user' });
   const [loading, setLoading] = useState(false);
@@ -115,10 +115,11 @@ function SignUp() {
   );
 }
 
-// Dashboard Component
+// ========== DASHBOARD COMPONENT ==========
 function Dashboard() {
   const [user, setUser] = useState(null);
   const [certificates, setCertificates] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -129,7 +130,19 @@ function Dashboard() {
     }
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
     setUser(userData);
+    fetchCertificates();
   }, [navigate]);
+
+  const fetchCertificates = async () => {
+    try {
+      const response = await api.get('/all-certificates');
+      setCertificates(response.data || []);
+    } catch (error) {
+      console.error('Error fetching certificates:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -137,19 +150,46 @@ function Dashboard() {
     navigate('/login');
   };
 
+  if (loading) {
+    return <div style={styles.loading}>Loading...</div>;
+  }
+
   return (
-    <div style={styles.container}>
+    <div style={styles.dashboardContainer}>
+      <div style={styles.header}>
+        <h1>🎓 Dashboard</h1>
+        <div style={styles.headerRight}>
+          <span>Welcome, {user?.name || 'User'}!</span>
+          <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
+        </div>
+      </div>
       <div style={styles.card}>
-        <h2 style={styles.subtitle}>Dashboard</h2>
-        <p><strong>Welcome, {user?.name || 'User'}!</strong></p>
-        <p>Role: {user?.role || 'User'}</p>
-        <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
+        <h3>Profile Information</h3>
+        <p><strong>Name:</strong> {user?.name}</p>
+        <p><strong>Email:</strong> {user?.email}</p>
+        <p><strong>Role:</strong> {user?.role}</p>
+      </div>
+      <div style={styles.card}>
+        <h3>Your Certificates</h3>
+        {certificates.length === 0 ? (
+          <p>No certificates found.</p>
+        ) : (
+          <ul style={styles.list}>
+            {certificates.map((cert) => (
+              <li key={cert.id} style={styles.listItem}>
+                <strong>{cert.student_name}</strong> - {cert.achievement}
+                <br />
+                <small>Code: {cert.certificate_code}</small>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
 }
 
-// Styles
+// ========== STYLES ==========
 const styles = {
   container: {
     display: 'flex',
@@ -167,6 +207,11 @@ const styles = {
     textAlign: 'center',
     maxWidth: '400px',
     width: '100%',
+  },
+  dashboardContainer: {
+    padding: '20px',
+    maxWidth: '800px',
+    margin: '0 auto',
   },
   title: {
     fontSize: '32px',
@@ -239,8 +284,37 @@ const styles = {
     marginTop: '20px',
     color: '#666',
   },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '30px',
+    padding: '20px',
+    background: 'white',
+    borderRadius: '10px',
+    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+  },
+  headerRight: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '15px',
+  },
+  list: {
+    listStyle: 'none',
+    padding: 0,
+  },
+  listItem: {
+    padding: '10px',
+    borderBottom: '1px solid #eee',
+  },
+  loading: {
+    textAlign: 'center',
+    padding: '50px',
+    fontSize: '20px',
+  },
 };
 
+// ========== MAIN APP ==========
 function App() {
   const isAuthenticated = !!localStorage.getItem('token');
 

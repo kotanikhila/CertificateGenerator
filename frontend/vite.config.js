@@ -6,14 +6,7 @@ export default defineConfig({
   base: '/',
   server: {
     port: 5173,
-    host: true,
-    proxy: {
-      '/api': {
-        target: 'https://certificate-generator-backend.onrender.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
-      }
-    }
+    host: true
   },
   build: {
     outDir: 'dist',
