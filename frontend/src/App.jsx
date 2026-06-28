@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
 import { api } from './services/api';
 
 // ========== HOME COMPONENT ==========
@@ -118,7 +118,6 @@ function SignUp() {
 // ========== DASHBOARD COMPONENT ==========
 function Dashboard() {
   const [user, setUser] = useState(null);
-  const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -130,19 +129,8 @@ function Dashboard() {
     }
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
     setUser(userData);
-    fetchCertificates();
+    setLoading(false);
   }, [navigate]);
-
-  const fetchCertificates = async () => {
-    try {
-      const response = await api.get('/all-certificates');
-      setCertificates(response.data || []);
-    } catch (error) {
-      console.error('Error fetching certificates:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -168,22 +156,6 @@ function Dashboard() {
         <p><strong>Name:</strong> {user?.name}</p>
         <p><strong>Email:</strong> {user?.email}</p>
         <p><strong>Role:</strong> {user?.role}</p>
-      </div>
-      <div style={styles.card}>
-        <h3>Your Certificates</h3>
-        {certificates.length === 0 ? (
-          <p>No certificates found.</p>
-        ) : (
-          <ul style={styles.list}>
-            {certificates.map((cert) => (
-              <li key={cert.id} style={styles.listItem}>
-                <strong>{cert.student_name}</strong> - {cert.achievement}
-                <br />
-                <small>Code: {cert.certificate_code}</small>
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
     </div>
   );
@@ -298,14 +270,6 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '15px',
-  },
-  list: {
-    listStyle: 'none',
-    padding: 0,
-  },
-  listItem: {
-    padding: '10px',
-    borderBottom: '1px solid #eee',
   },
   loading: {
     textAlign: 'center',
