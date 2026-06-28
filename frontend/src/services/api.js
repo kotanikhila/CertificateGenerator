@@ -1,7 +1,7 @@
 ﻿import axios from 'axios';
 
-// Use environment variable or fallback
-const API_URL = import.meta.env.VITE_API_URL || 'https://certificate-generator-backend.onrender.com';
+// ✅ UPDATE THIS URL with your backend URL
+const API_URL = 'https://certificate-generator-backend-8oxs.onrender.com';
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -23,7 +23,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor
+// Response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
