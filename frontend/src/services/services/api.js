@@ -1,5 +1,6 @@
 ﻿import axios from 'axios';
 
+// ✅ DIRECT BACKEND URL - Replace with your actual backend URL
 const API_URL = 'https://certificate-generator-backend-8oxs.onrender.com';
 
 export const api = axios.create({
@@ -10,20 +11,22 @@ export const api = axios.create({
   timeout: 30000,
 });
 
+// Log requests for debugging
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = Bearer ;
-    }
+    console.log('API Request:', config.method.toUpperCase(), config.url);
     return config;
   },
   (error) => Promise.reject(error)
 );
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('API Response:', response.status, response.config.url);
+    return response;
+  },
   (error) => {
+    console.error('API Error:', error.response?.status, error.response?.data);
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');

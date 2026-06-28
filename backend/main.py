@@ -24,16 +24,10 @@ except Exception as e:
 
 app = FastAPI(title="Certificate Generator Web App")
 
-# ✅ CORS for Render - Allow all origins
+# ✅ CORS - Allow all origins (for testing)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "https://certificategenerator-m0kv.onrender.com",
-        "https://*.onrender.com",
-        "*"  # For testing
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -54,7 +48,7 @@ def home():
 
 @app.get("/health")
 def health():
-    return {"status": "healthy", "message": "Backend is running"}
+    return {"status": "healthy", "message": "Backend is running on Render"}
 
 @app.post("/register")
 def register(user: RegisterSchema, db: Session = Depends(get_db)):
@@ -79,7 +73,9 @@ def register(user: RegisterSchema, db: Session = Depends(get_db)):
     return {
         "message": "Registered successfully",
         "user_id": new_user.id,
-        "role": new_user.role
+        "role": new_user.role,
+        "name": new_user.name,
+        "email": new_user.email
     }
 
 @app.post("/login")

@@ -9,14 +9,14 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     minHeight: '100vh',
-    background: '#f0f2f5',
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     padding: '20px',
   },
   card: {
     background: 'white',
     padding: '40px',
     borderRadius: '10px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+    boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
     textAlign: 'center',
     maxWidth: '400px',
     width: '100%',
@@ -46,24 +46,31 @@ const styles = {
     border: '1px solid #ddd',
     borderRadius: '5px',
     fontSize: '16px',
+    transition: 'border-color 0.3s',
+  },
+  inputFocus: {
+    borderColor: '#667eea',
+    outline: 'none',
   },
   loginBtn: {
     padding: '12px',
-    background: '#007bff',
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     color: 'white',
     border: 'none',
     borderRadius: '5px',
     fontSize: '16px',
     cursor: 'pointer',
+    transition: 'transform 0.2s',
   },
   signupBtn: {
     padding: '12px',
-    background: '#28a745',
+    background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
     color: 'white',
     border: 'none',
     borderRadius: '5px',
     fontSize: '16px',
     cursor: 'pointer',
+    transition: 'transform 0.2s',
   },
   logoutBtn: {
     padding: '12px',
@@ -79,6 +86,7 @@ const styles = {
     padding: '10px',
     borderRadius: '5px',
     marginBottom: '15px',
+    borderLeft: '4px solid #c62828',
   },
   success: {
     background: '#e8f5e9',
@@ -86,6 +94,7 @@ const styles = {
     padding: '10px',
     borderRadius: '5px',
     marginBottom: '15px',
+    borderLeft: '4px solid #2e7d32',
   },
   buttons: {
     display: 'flex',
@@ -105,7 +114,7 @@ const styles = {
     padding: '20px',
     background: 'white',
     borderRadius: '10px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
   },
   headerRight: {
     display: 'flex',
@@ -177,8 +186,22 @@ function Login() {
         <h2 style={styles.subtitle}>Login</h2>
         {error && <div style={styles.error}>{error}</div>}
         <form onSubmit={handleLogin} style={styles.form}>
-          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} style={styles.input} required />
-          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} style={styles.input} required />
+          <input 
+            type="email" 
+            placeholder="Email" 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            style={styles.input} 
+            required 
+          />
+          <input 
+            type="password" 
+            placeholder="Password" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            style={styles.input} 
+            required 
+          />
           <button type="submit" style={styles.loginBtn} disabled={loading}>
             {loading ? 'Logging in...' : 'Login'}
           </button>
@@ -223,10 +246,35 @@ function SignUp() {
         {error && <div style={styles.error}>{error}</div>}
         {success && <div style={styles.success}>{success}</div>}
         <form onSubmit={handleSignUp} style={styles.form}>
-          <input type="text" placeholder="Full Name" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} style={styles.input} required />
-          <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} style={styles.input} required />
-          <input type="password" placeholder="Password" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} style={styles.input} required />
-          <select value={formData.role} onChange={(e) => setFormData({...formData, role: e.target.value})} style={styles.input}>
+          <input 
+            type="text" 
+            placeholder="Full Name" 
+            value={formData.name} 
+            onChange={(e) => setFormData({...formData, name: e.target.value})} 
+            style={styles.input} 
+            required 
+          />
+          <input 
+            type="email" 
+            placeholder="Email" 
+            value={formData.email} 
+            onChange={(e) => setFormData({...formData, email: e.target.value})} 
+            style={styles.input} 
+            required 
+          />
+          <input 
+            type="password" 
+            placeholder="Password" 
+            value={formData.password} 
+            onChange={(e) => setFormData({...formData, password: e.target.value})} 
+            style={styles.input} 
+            required 
+          />
+          <select 
+            value={formData.role} 
+            onChange={(e) => setFormData({...formData, role: e.target.value})} 
+            style={styles.input}
+          >
             <option value="user">User</option>
             <option value="organization">Organization</option>
           </select>
@@ -291,13 +339,13 @@ function Dashboard() {
         </div>
       </div>
       {error && <div style={styles.error}>{error}</div>}
-      <div style={styles.card}>
+      <div style={{...styles.card, maxWidth: '100%'}}>
         <h3>Profile Information</h3>
         <p><strong>Name:</strong> {user?.name}</p>
         <p><strong>Email:</strong> {user?.email}</p>
         <p><strong>Role:</strong> {user?.role}</p>
       </div>
-      <div style={styles.card}>
+      <div style={{...styles.card, maxWidth: '100%'}}>
         <h3>Your Certificates</h3>
         {certificates.length === 0 ? (
           <p>No certificates found.</p>
@@ -313,8 +361,10 @@ function Dashboard() {
           </ul>
         )}
       </div>
-      <div style={styles.card}>
-        <Link to="/generate" style={styles.loginBtn}>Generate Certificate</Link>
+      <div style={{...styles.card, maxWidth: '100%'}}>
+        <Link to="/generate" style={{...styles.loginBtn, display: 'inline-block', padding: '12px 30px'}}>
+          Generate Certificate
+        </Link>
       </div>
     </div>
   );
@@ -373,13 +423,60 @@ function GenerateCertificate() {
         {error && <div style={styles.error}>{error}</div>}
         {success && <div style={styles.success}>{success}</div>}
         <form onSubmit={handleSubmit} style={styles.form}>
-          <input type="text" placeholder="Student Name" value={formData.student_name} onChange={(e) => setFormData({...formData, student_name: e.target.value})} style={styles.input} required />
-          <input type="email" placeholder="Student Email" value={formData.student_email} onChange={(e) => setFormData({...formData, student_email: e.target.value})} style={styles.input} required />
-          <input type="text" placeholder="Achievement" value={formData.achievement} onChange={(e) => setFormData({...formData, achievement: e.target.value})} style={styles.input} required />
-          <input type="text" placeholder="Event Name" value={formData.event_name} onChange={(e) => setFormData({...formData, event_name: e.target.value})} style={styles.input} required />
-          <input type="text" placeholder="Organization Name" value={formData.organization_name} onChange={(e) => setFormData({...formData, organization_name: e.target.value})} style={styles.input} required />
-          <input type="text" placeholder="Course Details" value={formData.course_details} onChange={(e) => setFormData({...formData, course_details: e.target.value})} style={styles.input} />
-          <input type="date" placeholder="Expiry Date" value={formData.expiry_date} onChange={(e) => setFormData({...formData, expiry_date: e.target.value})} style={styles.input} />
+          <input 
+            type="text" 
+            placeholder="Student Name" 
+            value={formData.student_name} 
+            onChange={(e) => setFormData({...formData, student_name: e.target.value})} 
+            style={styles.input} 
+            required 
+          />
+          <input 
+            type="email" 
+            placeholder="Student Email" 
+            value={formData.student_email} 
+            onChange={(e) => setFormData({...formData, student_email: e.target.value})} 
+            style={styles.input} 
+            required 
+          />
+          <input 
+            type="text" 
+            placeholder="Achievement" 
+            value={formData.achievement} 
+            onChange={(e) => setFormData({...formData, achievement: e.target.value})} 
+            style={styles.input} 
+            required 
+          />
+          <input 
+            type="text" 
+            placeholder="Event Name" 
+            value={formData.event_name} 
+            onChange={(e) => setFormData({...formData, event_name: e.target.value})} 
+            style={styles.input} 
+            required 
+          />
+          <input 
+            type="text" 
+            placeholder="Organization Name" 
+            value={formData.organization_name} 
+            onChange={(e) => setFormData({...formData, organization_name: e.target.value})} 
+            style={styles.input} 
+            required 
+          />
+          <input 
+            type="text" 
+            placeholder="Course Details" 
+            value={formData.course_details} 
+            onChange={(e) => setFormData({...formData, course_details: e.target.value})} 
+            style={styles.input} 
+          />
+          <input 
+            type="date" 
+            placeholder="Expiry Date" 
+            value={formData.expiry_date} 
+            onChange={(e) => setFormData({...formData, expiry_date: e.target.value})} 
+            style={styles.input} 
+          />
           <button type="submit" style={styles.loginBtn} disabled={loading}>
             {loading ? 'Generating...' : 'Generate Certificate'}
           </button>
