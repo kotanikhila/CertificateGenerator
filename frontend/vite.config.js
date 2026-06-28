@@ -6,14 +6,7 @@ export default defineConfig({
   base: '/',
   server: {
     port: 5173,
-    host: true,
-    proxy: {
-      '/api': {
-        target: 'https://certificategenerator-production-695e.up.railway.app',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
-      }
-    }
+    host: true
   },
   build: {
     outDir: 'dist',
