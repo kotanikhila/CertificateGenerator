@@ -1,7 +1,7 @@
 ﻿import axios from 'axios';
 
-// ✅ Railway backend URL - you'll replace this after deployment
-const API_URL = import.meta.env.VITE_API_URL || 'https://your-railway-backend-url.up.railway.app';
+// ✅ BACKEND URL - Replace with your actual Railway URL
+const API_URL = 'https://certificategenerator-production-2fde.up.railway.app';
 
 export const api = axios.create({
   baseURL: API_URL,
