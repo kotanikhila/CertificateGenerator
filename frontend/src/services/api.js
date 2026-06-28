@@ -1,7 +1,7 @@
 ﻿import axios from 'axios';
 
-// ✅ CORRECT BACKEND URL
-const API_URL = 'https://certificate-generator-backend-8oxs.onrender.com';
+// ✅ Railway backend URL - you'll replace this after deployment
+const API_URL = import.meta.env.VITE_API_URL || 'https://your-railway-backend-url.up.railway.app';
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -11,7 +11,6 @@ export const api = axios.create({
   timeout: 30000,
 });
 
-// Add token interceptor
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -23,7 +22,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor
 api.interceptors.response.use(
   (response) => response,
   (error) => {

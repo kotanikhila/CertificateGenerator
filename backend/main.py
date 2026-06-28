@@ -24,10 +24,15 @@ except Exception as e:
 
 app = FastAPI(title="Certificate Generator Web App")
 
-# ✅ CORS - Allow all origins (for testing)
+# ✅ CORS for Railway
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://*.up.railway.app",
+        "*"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -44,20 +49,18 @@ def get_db():
 
 @app.get("/")
 def home():
-    return {"message": "Certificate Generator API is running"}
+    return {"message": "Certificate Generator API is running on Railway"}
 
 @app.get("/health")
 def health():
-    return {"status": "healthy", "message": "Backend is running on Render"}
+    return {"status": "healthy", "message": "Backend is running"}
 
 @app.post("/register")
 def register(user: RegisterSchema, db: Session = Depends(get_db)):
-    # Check if user exists
     old_user = db.query(User).filter(User.email == user.email).first()
     if old_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    # Create new user
     new_user = User(
         name=user.name,
         email=user.email,

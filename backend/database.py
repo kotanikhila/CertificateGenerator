@@ -3,7 +3,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 
-# Use SQLite for Render
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./certificates.db")
 
 if DATABASE_URL.startswith("sqlite"):
