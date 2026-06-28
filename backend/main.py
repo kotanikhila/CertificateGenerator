@@ -21,18 +21,18 @@ try:
     print("✅ Database tables created successfully!")
 except Exception as e:
     print(f"⚠️ Database error: {e}")
-    print("Using SQLite database...")
 
 app = FastAPI(title="Certificate Generator Web App")
 
-# CORS for Render
+# ✅ CORS for Render - Allow all origins
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "https://certificate-generator-frontend.onrender.com",
+        "http://localhost:3000",
+        "https://certificategenerator-m0kv.onrender.com",
         "https://*.onrender.com",
-        "*"
+        "*"  # For testing
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -54,18 +54,16 @@ def home():
 
 @app.get("/health")
 def health():
-    return {"status": "healthy", "message": "Backend is running on Render"}
+    return {"status": "healthy", "message": "Backend is running"}
 
 @app.post("/register")
 def register(user: RegisterSchema, db: Session = Depends(get_db)):
+    # Check if user exists
     old_user = db.query(User).filter(User.email == user.email).first()
-
     if old_user:
-        raise HTTPException(
-            status_code=400,
-            detail="Email already registered"
-        )
+        raise HTTPException(status_code=400, detail="Email already registered")
 
+    # Create new user
     new_user = User(
         name=user.name,
         email=user.email,
@@ -89,16 +87,10 @@ def login(user: LoginSchema, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.email == user.email).first()
 
     if not db_user:
-        raise HTTPException(
-            status_code=404,
-            detail="User not found"
-        )
+        raise HTTPException(status_code=404, detail="User not found")
 
     if not verify_password(user.password, db_user.password):
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid password"
-        )
+        raise HTTPException(status_code=400, detail="Invalid password")
 
     token = create_token({
         "email": db_user.email,
@@ -110,7 +102,9 @@ def login(user: LoginSchema, db: Session = Depends(get_db)):
         "message": "Login successful",
         "token": token,
         "role": db_user.role,
-        "user_id": db_user.id
+        "user_id": db_user.id,
+        "name": db_user.name,
+        "email": db_user.email
     }
 
 @app.post("/generate-certificate/{organization_id}")
